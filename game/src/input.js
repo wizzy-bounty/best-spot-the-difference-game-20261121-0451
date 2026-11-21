@@ -13,6 +13,10 @@ function toCanvas(canvas, ev) {
   };
 }
 
+function isInside(px, py, b) {
+  return px >= b.x && px <= b.x + b.w && py >= b.y && py <= b.y + b.h;
+}
+
 function panelAt(state, px, py) {
   if (py < PANEL_Y || py > PANEL_Y + PANEL_H) return null;
   if (px >= LEFT_X && px <= LEFT_X + PANEL_W) return { side: 'left', x: px - LEFT_X, y: py - PANEL_Y };
@@ -25,7 +29,7 @@ export function attachInput(canvas, state, actions) {
     const p = toCanvas(canvas, ev);
     state.hover = null;
     for (const b of computeButtons(state)) {
-      if (p.x >= b.x && p.x <= b.x + b.w && p.y >= b.y && p.y <= b.y + b.h) state.hover = b.id;
+      if (isInside(p.x, p.y, b)) state.hover = b.id;
     }
     canvas.style.cursor = state.hover ? 'pointer' : 'default';
   });
@@ -33,7 +37,7 @@ export function attachInput(canvas, state, actions) {
   canvas.addEventListener('click', (ev) => {
     const p = toCanvas(canvas, ev);
     for (const b of computeButtons(state)) {
-      if (p.x >= b.x && p.x <= b.x + b.w && p.y >= b.y && p.y <= b.y + b.h) {
+      if (isInside(p.x, p.y, b)) {
         actions.press(b.id);
         return;
       }
